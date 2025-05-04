@@ -1,9 +1,5 @@
 import axios from "axios";
-
-// 🔗 Base API URL
-// const API_URL = "http://localhost:4500/api";
-// const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://ranzomfragrances-backend.onrender.com/api";
-const API_URL =  "https://ranzomfragrances-backend.onrender.com/api";
+import { API_URL } from "./utils";
 
 // 🔐 Token Handlers
 export const setLoginToken = (token) => {

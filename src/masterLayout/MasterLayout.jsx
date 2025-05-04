@@ -240,6 +240,125 @@ const MasterLayout = ({ children }) => {
                 </li>
               </ul>
             </li>
+            <li className='dropdown'>
+              <Link href='#'>
+                <Icon
+                  icon='mdi:package-variant-closed'
+                  className='menu-icon'
+                />
+                <span>Products</span>
+              </Link>
+              <ul className='sidebar-submenu'>
+                <li>
+                  <Link
+                    href='/product-list'
+                    className={pathname === "/product-list" ? "active-page" : ""}
+                  >
+                    <i className='ri-circle-fill circle-icon text-primary-600 w-auto' />
+                    Product List
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href='/add-product'
+                    className={pathname === "/add-product" ? "active-page" : ""}
+                  >
+                    <i className='ri-circle-fill circle-icon text-info-main w-auto' />{" "}
+                    Add Product
+                  </Link>
+                </li>
+                {/* <li>
+                  <Link
+                    href='/index-2'
+                    className={pathname === "/index-2" ? "active-page" : ""}
+                  >
+                    <i className='ri-circle-fill circle-icon text-warning-main w-auto' />{" "}
+                    CRM
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href='/index-3'
+                    className={pathname === "/index-3" ? "active-page" : ""}
+                  >
+                    <i className='ri-circle-fill circle-icon text-info-main w-auto' />{" "}
+                    eCommerce
+                  </Link>
+                </li> */}
+                {/* <li>
+                  <Link
+                    href='/index-4'
+                    className={pathname === "/index-4" ? "active-page" : ""}
+                  >
+                    <i className='ri-circle-fill circle-icon text-danger-main w-auto' />
+                    Cryptocurrency
+                  </Link>
+                </li> */}
+                {/* <li>
+                  <Link
+                    href='/index-5'
+                    className={pathname === "/index-5" ? "active-page" : ""}
+                  >
+                    <i className='ri-circle-fill circle-icon text-success-main w-auto' />{" "}
+                    Investment
+                  </Link>
+                </li> */}
+                {/* <li>
+                  <Link
+                    href='/index-6'
+                    className={pathname === "/index-6" ? "active-page" : ""}
+                  >
+                    <i className='ri-circle-fill circle-icon text-purple w-auto' />{" "}
+                    LMS
+                  </Link>
+                </li> */}
+                {/* <li>
+                  <Link
+                    href='/index-7'
+                    className={pathname === "/index-7" ? "active-page" : ""}
+                  >
+                    <i className='ri-circle-fill circle-icon text-info-main w-auto' />{" "}
+                    NFT &amp; Gaming
+                  </Link>
+                </li> */}
+                {/* <li>
+                  <Link
+                    href='/index-8'
+                    className={pathname === "/index-8" ? "active-page" : ""}
+                  >
+                    <i className='ri-circle-fill circle-icon text-info-main w-auto' />{" "}
+                    Medical
+                  </Link>
+                </li> */}
+                {/* <li>
+                  <Link
+                    href='/index-9'
+                    className={pathname === "/index-9" ? "active-page" : ""}
+                  >
+                    <i className='ri-circle-fill circle-icon text-info-main w-auto' />{" "}
+                    Analytics
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href='/index-10'
+                    className={pathname === "/index-10" ? "active-page" : ""}
+                  >
+                    <i className='ri-circle-fill circle-icon text-info-main w-auto' />{" "}
+                    POS & Inventory
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href='/index-11'
+                    className={pathname === "/index-11" ? "active-page" : ""}
+                  >
+                    <i className='ri-circle-fill circle-icon text-info-main w-auto' />{" "}
+                    Finance & Banking
+                  </Link>
+                </li> */}
+              </ul>
+            </li>
 
             <li className='sidebar-menu-group-title'>Application</li>
             <li>
