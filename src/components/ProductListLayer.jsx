@@ -6,6 +6,8 @@ import Loader from "./Loader";
 import { BASE_URL } from "@/utils/utils";
 import { useState } from "react";
 import toast from "react-hot-toast";
+import Pagination from "@/helper/Pagination";
+import { format } from "date-fns";
 
 const ProductListLayer = () => {
   const { isLoading, error, data, refetch } = useGetItems();
@@ -129,6 +131,7 @@ const ProductListLayer = () => {
                   </div>
                 </th>
                 <th scope="col">Create Date</th>
+                <th scope="col">Update Date</th>
                 <th scope="col">Product</th>
                 <th scope="col">Title</th>
                 <th scope="col">Category</th>
@@ -158,7 +161,16 @@ const ProductListLayer = () => {
                       {item?.hsnCode || ""}
                     </div>
                   </td>
-                  <td>{item?.createdAt || ""} </td>
+                  <td>
+                    {item?.createdAt
+                      ? format(new Date(item.createdAt), "dd-MM-yyyy hh:mm a")
+                      : ""}
+                  </td>
+                  <td>
+                    {item?.updatedAt
+                      ? format(new Date(item.updatedAt), "dd-MM-yyyy hh:mm a")
+                      : ""}
+                  </td>
                   <td>
                     {" "}
                     <div className="d-flex align-items-center">
@@ -178,52 +190,57 @@ const ProductListLayer = () => {
                   </td>
                   <td>
                     <span className="text-md mb-0 fw-normal text-secondary-light">
-                      {item?.category || ""}
+                      {item?.category?.title || ""}
                     </span>
                   </td>
                   <td>{item?.ml || ""}</td>
                   <td>{item?.gender || ""}</td>
                   <td className="text-center">
-                    {item?.is_active ? (
-                      <span className="bg-success-focus text-success-600 border border-success-main px-24 py-4 radius-4 fw-medium text-sm">
-                        Active
-                      </span>
-                    ) : (
-                      <span className="bg-danger-focus text-danger-600 border border-danger-main px-24 py-4 radius-4 fw-medium text-sm">
-                        Inactive
-                      </span>
-                    )}
+                    <span
+                      className={`${
+                        item?.is_active
+                          ? "bg-success-focus text-success-600 border border-success-main"
+                          : "bg-danger-focus text-danger-600 border border-danger-main"
+                      } px-24 py-4 radius-4 fw-medium text-sm`}
+                    >
+                      {item?.is_active ? "Active" : "Inactive"}
+                    </span>
                   </td>
+
                   <td className="text-center">
                     <div className="d-flex align-items-center gap-10 justify-content-center">
-                      {item?.is_active ? (
-                        <button
-                          type="button"
-                          className="bg-info-focus bg-hover-info-200 text-info-600 fw-medium w-40-px h-40-px d-flex justify-content-center align-items-center rounded-circle"
-                          onClick={() => handleUpdate(item, true)}
-                        >
-                          <Icon
-                            icon="majesticons:eye-line"
-                            className="icon text-xl"
-                          />
-                        </button>
-                      ) : (
-                        <button
-                          type="button"
-                          className="remove-item-btn bg-danger-focus bg-hover-danger-200 text-danger-600 fw-medium w-40-px h-40-px d-flex justify-content-center align-items-center rounded-circle"
-                          onClick={() => handleUpdate(item, true)}
-                        >
-                          <Icon
-                            icon="majesticons:eye-line"
-                            className="icon text-xl"
-                          />
-                        </button>
-                      )}
                       <button
                         type="button"
-                        className="bg-success-focus text-success-600 bg-hover-success-200 fw-medium w-40-px h-40-px d-flex justify-content-center align-items-center rounded-circle"
+                        className="bg-info-focus text-info-600 bg-hover-info-200 fw-medium w-40-px h-40-px d-flex justify-content-center align-items-center rounded-circle"
+                      >
+                        <Icon
+                          icon="majesticons:eye-line"
+                          className="menu-icon"
+                        />
+                      </button>
+                      <button
+                        type="button"
+                        className="bg-info-focus text-info-600 bg-hover-info-200 fw-medium w-40-px h-40-px d-flex justify-content-center align-items-center rounded-circle"
                       >
                         <Icon icon="lucide:edit" className="menu-icon" />
+                      </button>
+                      <button
+                        type="button"
+                        className={`${
+                          item?.is_active
+                            ? "bg-success-focus bg-hover-success-200 text-success-600"
+                            : "bg-danger-focus bg-hover-danger-200 text-danger-600"
+                        } fw-medium w-40-px h-40-px d-flex justify-content-center align-items-center rounded-circle`}
+                        onClick={() => handleUpdate(item, true)}
+                      >
+                        <Icon
+                          icon={
+                            item?.is_active
+                              ? "mdi:lock-open-outline"
+                              : "mdi:lock-outline"
+                          }
+                          className="icon text-xl"
+                        />
                       </button>
                       <button
                         type="button"
@@ -305,7 +322,7 @@ const ProductListLayer = () => {
           </ul>
         </div> */}
         {/* Pagination Controls */}
-        <div className="d-flex align-items-center justify-content-between flex-wrap gap-2 mt-24">
+        {/* <div className="d-flex align-items-center justify-content-between flex-wrap gap-2 mt-24">
           <span>
             Showing {(currentPage - 1) * itemsPerPage + 1} to{" "}
             {Math.min(currentPage * itemsPerPage, items.length)} of{" "}
@@ -343,7 +360,13 @@ const ProductListLayer = () => {
               </button>
             </li>
           </ul>
-        </div>
+        </div> */}
+        <Pagination
+          currentPage={currentPage}
+          totalItems={items.length}
+          itemsPerPage={itemsPerPage}
+          onPageChange={handlePageChange}
+        />
       </div>
     </div>
   );

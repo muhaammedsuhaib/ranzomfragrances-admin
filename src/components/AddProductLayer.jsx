@@ -7,20 +7,8 @@ import toast from "react-hot-toast";
 import { useCreateItem } from "@/api/item";
 import { useRouter } from "next/navigation";
 import Loader from "./Loader";
-
-const categories = [
-  "Perfume",
-  "Attar",
-  "Body Spray",
-  "Room Spray",
-  "Lotion",
-  "Body cream",
-  "Gift set perfume",
-  "Bukhoor",
-  "Skin roll on",
-];
-
-const milliliters = Array.from({ length: 60 }, (_, i) => `${(i + 1) * 50} ml`);
+import { useGetCategories } from "@/api/category";
+import Select from "react-select";
 
 const schema = z.object({
   hsnCode: z.string().min(1, "HSN Code is required"),
@@ -40,13 +28,37 @@ const schema = z.object({
 
 const AddProductLayer = () => {
   const router = useRouter();
+  const { isLoading, error, data, refetch } = useGetCategories();
+  const categoryOptions =
+    data?.data
+      ?.filter((cat) => cat?.is_active)
+      .map((cat) => ({
+        value: cat._id,
+        label: cat.title,
+      })) || [];
+  const genderOptions = [
+    { value: "male", label: "Male" },
+    { value: "women", label: "Women" },
+    { value: "unisex", label: "Unisex" },
+  ];
+  const mlOptions = Array.from({ length: 1000 }, (_, i) => {
+    const value = `${i + 1} ml`;
+    return { value, label: value };
+  });
+
   const [images, setImages] = useState([]);
-  const { mutate, isLoading, error, data } = useCreateItem();
+  const {
+    mutate,
+    isLoading: createLoading,
+    error: createError,
+    data: createData,
+  } = useCreateItem();
   const {
     register,
     handleSubmit,
     formState: { errors },
     reset,
+    setValue,
   } = useForm({
     resolver: zodResolver(schema),
   });
@@ -123,39 +135,30 @@ const AddProductLayer = () => {
 
         <div className="col-md-6">
           <label className="form-label">ML</label>
-          <select
-            {...register("ml")}
-            className="form-control radius-8"
-            defaultValue=""
-          >
-            <option value="" disabled>
-              Select ML
-            </option>
-            {milliliters.map((ml, i) => (
-              <option key={i} value={ml}>
-                {ml}
-              </option>
-            ))}
-          </select>
+
+          <Select
+            options={mlOptions}
+            onChange={(selectedOption) => setValue("ml", selectedOption?.value)}
+            classNamePrefix="react-select"
+            placeholder="Select Ml"
+            isSearchable={true}
+            name="ml"
+          />
           {errors.ml && <p className="text-danger">{errors.ml.message}</p>}
         </div>
 
         <div className="col-md-6">
           <label className="form-label">Category</label>
-          <select
-            {...register("category")}
-            className="form-control radius-8"
-            defaultValue=""
-          >
-            <option value="" disabled>
-              Select Category
-            </option>
-            {categories.map((cat, i) => (
-              <option key={i} value={cat}>
-                {cat}
-              </option>
-            ))}
-          </select>
+          <Select
+            options={categoryOptions}
+            onChange={(selectedOption) =>
+              setValue("category", selectedOption?.value)
+            }
+            classNamePrefix="react-select"
+            placeholder="Select Category"
+            isSearchable={true}
+            name="category"
+          />
           {errors.category && (
             <p className="text-danger">{errors.category.message}</p>
           )}
@@ -163,18 +166,16 @@ const AddProductLayer = () => {
 
         <div className="col-md-6">
           <label className="form-label">Gender</label>
-          <select
-            {...register("gender")}
-            className="form-control radius-8"
-            defaultValue=""
-          >
-            <option value="" disabled>
-              Select Gender
-            </option>
-            <option value="male">Male</option>
-            <option value="women">Women</option>
-            <option value="unisex">Unisex</option>
-          </select>
+          <Select
+            options={genderOptions}
+            onChange={(selectedOption) =>
+              setValue("gender", selectedOption?.value)
+            }
+            classNamePrefix="react-select"
+            placeholder="Select Gender"
+            isSearchable={true}
+            name="gender"
+          />
           {errors.gender && (
             <p className="text-danger">{errors.gender.message}</p>
           )}

@@ -3,7 +3,7 @@ import ProductListLayer from "@/components/ProductListLayer";
 import MasterLayout from "@/masterLayout/MasterLayout";
 
 export const metadata = {
-  title: "Product Management | Admin Panel - Rranzom Fragrances",
+  title: "Product List | Admin Panel - Rranzom Fragrances",
   description:
     "Manage and organize products efficiently in the Rranzom Fragrances admin dashboard. Add, edit, or remove items with ease and control.",
 };
