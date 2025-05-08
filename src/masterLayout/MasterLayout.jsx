@@ -375,6 +375,17 @@ const MasterLayout = ({ children }) => {
                     Category List
                   </Link>
                 </li>
+                <li>
+                  <Link
+                    href="/add-category"
+                    className={
+                      pathname === "/add-category" ? "active-page" : ""
+                    }
+                  >
+                    <i className="ri-circle-fill circle-icon text-primary-600 w-auto" />
+                    Add Category
+                  </Link>
+                </li>
                 {/* <li>
                   <Link
                     href='/index-2'

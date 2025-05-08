@@ -14,7 +14,7 @@ const ProductListLayer = () => {
   const items = data?.data || [];
   const {
     mutate,
-    isLoading: updateLoading,
+    isPending: updateLoading,
     error: updateError,
     data: updateData,
   } = useUpdateItem();
@@ -175,7 +175,10 @@ const ProductListLayer = () => {
                     {" "}
                     <div className="d-flex align-items-center">
                       <img
-                        src={`${BASE_URL}${item?.images[0]}`}
+                        src={
+                          item?.images[0] ||
+                          "https://res.cloudinary.com/dmildebio/image/upload/v1746551298/ujz0bcly43gxeytotmtc.png"
+                        }
                         alt="Wowdash"
                         className="w-40-px h-40-px rounded-circle flex-shrink-0 me-12 overflow-hidden"
                       />

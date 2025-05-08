@@ -10,23 +10,35 @@ import {
   useGetCategories,
   useUpdateCategory,
 } from "@/api/category";
+import { z } from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import Link from "next/link";
 
+export const categorySchema = z.object({
+  category: z.string().min(1, "Category is required"),
+  description: z.string().optional(),
+});
 const CategoryListLayer = () => {
-  const [categoryInput, setCategoryInput] = useState("");
-  const [editMode, setEditMode] = useState(false);
-  const [editId, setEditId] = useState(null);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: zodResolver(categorySchema),
+  });
 
   const { isLoading, error, data, refetch } = useGetCategories();
   const items = data?.data || [];
   const {
     mutate,
-    isLoading: updateLoading,
+    isPending: updateLoading,
     error: updateError,
     data: updateData,
   } = useUpdateCategory();
   const {
     mutate: createMutate,
-    isLoading: createLoading,
+    isPending: createLoading,
     error: createError,
     data: createData,
   } = useCreateCategory();
@@ -67,100 +79,30 @@ const CategoryListLayer = () => {
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
-  const handleEditClick = (item) => {
-    setCategoryInput(item?.title);
-    setEditMode(true);
-    setEditId(item?._id);
-  };
-
-  const handleAddCategory = async (e) => {
-    e.preventDefault();
-
-    if (!categoryInput.trim()) return;
-
-    if (editMode && editId) {
-      const data = {
-        id: editId,
-        title: categoryInput,
-      };
-      mutate(data, {
-        onSuccess: (response) => {
-          toast.success(response?.message || "Category Update Successfully!");
-          refetch();
-        },
-        onError: (err) => {
-          console.log(err);
-          toast.error(
-            err?.message || "An error occurred while updating the category."
-          );
-        },
-      });
-    } else {
-      const data = {
-        title: categoryInput,
-      };
-      createMutate(data, {
-        onSuccess: (response) => {
-          toast.success(response?.message || "Category created Successfully!");
-          refetch();
-        },
-        onError: (err) => {
-          console.log(err);
-          toast.error(
-            err?.message || "An error occurred while creating the category."
-          );
-        },
-      });
-    }
-
-    // Reset form state
-    setCategoryInput("");
-    setEditMode(false);
-    setEditId(null);
-  };
 
   const isAnyLoading = isLoading || updateLoading || createLoading;
 
   if (isAnyLoading) {
-    return <Loader message="Loading Categories..." />;
+    const msg = createLoading
+      ? "Creating Category..."
+      : updateLoading
+      ? "Updating Category..."
+      : "Loading Categories...";
+    return <Loader message={msg} />;
   }
   return (
     <div className="card h-100 p-0 radius-12">
       <div className="card-header border-bottom bg-base py-16 px-24 d-flex align-items-center flex-wrap gap-3 justify-content-between">
-        <form
-          className="navbar-search d-flex align-items-center gap-3"
-          onSubmit={handleAddCategory}
+        <Link
+          href="/add-category"
+          className="btn btn-primary text-sm btn-sm px-12 py-12 radius-8 d-flex align-items-center gap-2"
         >
-          <input
-            type="text"
-            name="category"
-            value={categoryInput}
-            onChange={(e) => setCategoryInput(e.target.value)}
-            placeholder="Add New Category"
-            required
-            className="form-control bg-base h-40-px w-auto px-3 text-sm"
+          <Icon
+            icon="ic:baseline-plus"
+            className="icon text-xl line-height-1"
           />
-          <button
-            type="submit"
-            className="btn btn-primary d-flex align-items-center gap-2 px-12 py-8 radius-8 text-sm"
-            disabled={createLoading || updateLoading}
-          >
-            {editMode ? "Update Category" : "Add Category"}
-          </button>
-          {editMode && (
-            <button
-              type="button"
-              className="btn btn-outline-danger d-flex align-items-center gap-2 px-12 py-8 radius-8 text-sm"
-              onClick={() => {
-                setCategoryInput("");
-                setEditMode(false);
-                setEditId(null);
-              }}
-            >
-              Cancel
-            </button>
-          )}
-        </form>
+          Add Category
+        </Link>
       </div>
       <div className="card-body p-24">
         <div className="table-responsive scroll-sm">
@@ -168,6 +110,8 @@ const CategoryListLayer = () => {
             <thead>
               <tr>
                 <th scope="col">Title</th>
+                <th scope="col">Image</th>
+                <th scope="col">Description</th>
                 <th scope="col">Create Date</th>
                 <th scope="col">Update Date</th>
                 <th scope="col" className="text-center">
@@ -189,6 +133,26 @@ const CategoryListLayer = () => {
                     </div>
                   </td>
                   <td>
+                    {" "}
+                    <div className="d-flex align-items-center">
+                      <img
+                        src={
+                          item?.images[0] ||
+                          "https://res.cloudinary.com/dmildebio/image/upload/v1746551298/ujz0bcly43gxeytotmtc.png"
+                        }
+                        alt="Wowdash"
+                        className="w-40-px h-40-px rounded-circle flex-shrink-0 me-12 overflow-hidden"
+                      />
+                    </div>{" "}
+                  </td>
+
+                  <td>
+                    {" "}
+                    <div className="d-flex align-items-center">
+                      {item?.description || ""}
+                    </div>{" "}
+                  </td>
+                  <td>
                     {item?.createdAt
                       ? format(new Date(item.createdAt), "dd-MM-yyyy hh:mm a")
                       : ""}
@@ -198,7 +162,6 @@ const CategoryListLayer = () => {
                       ? format(new Date(item.updatedAt), "dd-MM-yyyy hh:mm a")
                       : ""}
                   </td>
-
                   <td className="text-center">
                     <span
                       className={`${
@@ -210,13 +173,12 @@ const CategoryListLayer = () => {
                       {item?.is_active ? "Active" : "Inactive"}
                     </span>
                   </td>
-
                   <td className="text-center">
                     <div className="d-flex align-items-center gap-10 justify-content-center">
                       <button
                         type="button"
                         className="bg-info-focus text-info-600 bg-hover-info-200 fw-medium w-40-px h-40-px d-flex justify-content-center align-items-center rounded-circle"
-                        onClick={() => handleEditClick(item)}
+                        // onClick={() => handleEditClick(item)}
                       >
                         <Icon icon="lucide:edit" className="menu-icon" />
                       </button>

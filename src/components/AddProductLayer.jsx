@@ -9,6 +9,7 @@ import { useRouter } from "next/navigation";
 import Loader from "./Loader";
 import { useGetCategories } from "@/api/category";
 import Select from "react-select";
+import Link from "next/link";
 
 const schema = z.object({
   hsnCode: z.string().min(1, "HSN Code is required"),
@@ -21,13 +22,15 @@ const schema = z.object({
   salePrice: z.string().min(1, "Required"),
   mrpPrice: z.string().min(1, "Required"),
   openQuantity: z.string().min(1, "Required"),
-  manufactureDate: z.string().min(1, "Required"),
+  manufactureDate: z.string().optional(),
   expiryDate: z.string().optional(),
   description: z.string().optional(),
 });
 
 const AddProductLayer = () => {
   const router = useRouter();
+    const [urls, setUrls] = useState([]);
+    const [currentUrl, setCurrentUrl] = useState("");
   const { isLoading, error, data, refetch } = useGetCategories();
   const categoryOptions =
     data?.data
@@ -49,7 +52,7 @@ const AddProductLayer = () => {
   const [images, setImages] = useState([]);
   const {
     mutate,
-    isLoading: createLoading,
+    isPending: createLoading,
     error: createError,
     data: createData,
   } = useCreateItem();
@@ -70,6 +73,10 @@ const AddProductLayer = () => {
     Object.entries(data).forEach(([key, value]) => {
       formData.append(key, value);
     });
+    //Append urls
+    if (urls.length > 0) {
+      formData.append("urls", JSON.stringify(urls));
+    }
     // Append images correctly
     images.forEach((file) => {
       formData.append("images", file); // Use SAME field name as Multer expects
@@ -102,7 +109,34 @@ const AddProductLayer = () => {
   const removeImage = (index) => {
     setImages((prev) => prev.filter((_, i) => i !== index));
   };
-  if (isLoading) return <Loader message="Creating Item..." />;
+    const handleAddUrl = () => {
+      if (!currentUrl.trim()) return;
+  
+      try {
+        // Validate URL format
+        new URL(currentUrl);
+        setUrls((prev) => [...prev, currentUrl]);
+        setCurrentUrl("");
+      } catch (error) {
+        toast.error("Please enter a valid URL (e.g., https://example.com)");
+      }
+    };
+  
+    const handleUrlKeyPress = (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        handleAddUrl();
+      }
+    };
+  
+    const removeUrl = (index) => {
+      setUrls((prev) => prev.filter((_, i) => i !== index));
+    };
+
+  if (isLoading || createLoading) {
+    const msg = createLoading ? "Creating Item..." : "Loading...";
+    return <Loader message={msg} />;
+  }
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
@@ -311,6 +345,53 @@ const AddProductLayer = () => {
           </div>
         </div>
 
+        {/* upload urls  */}
+        <div className="mb-3">
+          <label className="form-label">Add URLs</label>
+          <div className="input-group mb-2">
+            <input
+              type="url"
+              value={currentUrl}
+              onChange={(e) => setCurrentUrl(e.target.value)}
+              onKeyPress={handleUrlKeyPress}
+              placeholder="Enter URL (e.g., https://example.com)"
+              className="form-control"
+            />
+            <button
+              type="button"
+              className="btn btn-primary"
+              onClick={handleAddUrl}
+            >
+              Add URL
+            </button>
+          </div>
+
+          {urls.length > 0 && (
+            <div className="mt-3">
+              <h6>Added URLs ({urls.length}):</h6>
+              <ul className="list-group">
+                {urls.map((url, index) => (
+                  <li
+                    key={index}
+                    className="list-group-item d-flex justify-content-between align-items-center"
+                  >
+                    <span className="text-truncate" style={{ maxWidth: "80%" }}>
+                      {url}
+                    </span>
+                    <button
+                      type="button"
+                      className="btn btn-sm btn-outline-danger"
+                      onClick={() => removeUrl(index)}
+                    >
+                      Remove
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+
         <div className="col-md-12">
           <label className="form-label">Description</label>
           <textarea
@@ -321,15 +402,53 @@ const AddProductLayer = () => {
         </div>
       </div>
 
-      <div className="d-flex justify-content-end gap-3 mt-4">
-        <button
-          type="button"
-          className="btn border border-danger-600 text-danger-600 px-4 py-2 radius-8"
+      <div className="d-flex justify-content-between flex-wrap gap-3 mt-5">
+        <Link
+          href="/product-list"
+          style={{
+            fontSize: "1rem",
+            padding: "12px 24px",
+            borderRadius: "8px",
+            border: "2px solid #dc3545",
+            color: "#dc3545",
+            backgroundColor: "transparent",
+            transition: "all 0.3s ease",
+            textDecoration: "none",
+            display: "inline-block",
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = "#dc3545";
+            e.currentTarget.style.color = "#fff";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = "transparent";
+            e.currentTarget.style.color = "#dc3545";
+          }}
         >
           Cancel
-        </button>
-        <button type="submit" className="btn btn-primary px-4 py-2 radius-8">
-          Save Item
+        </Link>
+
+        <button
+          type="submit"
+          style={{
+            fontSize: "1rem",
+            padding: "12px 24px",
+            borderRadius: "8px",
+            border: "2px solid #0d6efd",
+            color: "#0d6efd",
+            backgroundColor: "transparent",
+            transition: "all 0.3s ease",
+          }}
+          onMouseOver={(e) => {
+            e.target.style.backgroundColor = "#0d6efd";
+            e.target.style.color = "#fff";
+          }}
+          onMouseOut={(e) => {
+            e.target.style.backgroundColor = "transparent";
+            e.target.style.color = "#0d6efd";
+          }}
+        >
+          Save
         </button>
       </div>
     </form>

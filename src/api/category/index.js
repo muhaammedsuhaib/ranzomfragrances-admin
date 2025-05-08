@@ -27,7 +27,11 @@ const useGetCategories = () => {
  */
 const createCategory = async (data) => {
   try {
-    const response = await APIClientPrivate.post("/category", data);
+    const response = await APIClientPrivate.post("/category", data,{
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
     return response.data;
   } catch (error) {
     throw error.response?.data || new Error("An unexpected error occurred.");
